@@ -1,0 +1,11 @@
+/* App.css - Styles for the main App component */
+
+.app {
+  text-align: center;
+  padding: 20px;
+}
+
+.app h1 {
+  color: #333;
+  margin-bottom: 20px;
+} 
