@@ -47,7 +47,15 @@ io.on("connection", (socket) => {
 
 //Middleware setup
 app.use(express.json({limit:"4mb"}));
-app.use(cors());
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://chat-app-cyan-sigma.vercel.app"
+];
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 //Routes setup
 
