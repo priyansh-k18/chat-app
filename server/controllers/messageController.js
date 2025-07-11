@@ -31,7 +31,6 @@ export const getUsersForSiderbar = async (req,res) => {
         res.json({success:true, users:filteredUsers, unseenMessages});
 
     }catch(error){
-        console.log(error.message);
         res.status(500).json({success:false, message:error.message});
     }
 }
@@ -59,7 +58,6 @@ export const getMessages = async (req,res) => {
         res.json({success:true, messages});
     }
     catch(error){
-        console.log(error.message);
         res.status(500).json({success:false, message:error.message});
     }
 }
@@ -73,7 +71,6 @@ export const makeMessageSeen = async (req,res) => {
         res.json({success:true, message:"Message marked as seen"});
 
     }catch(error){
-         console.log(error.message);
          res.status(500).json({success:false, message:error.message});
     }
 }
@@ -85,37 +82,70 @@ export const sendMessage = async (req,res) => {
         const receiverId = req.params.id;
         const senderId = req.user._id;
 
-        console.log("Sending message:", { text, image: !!image, receiverId, senderId });
-
-        let imageUrl;
+        let imageUrl = "";
         if(image){
-           const uploadResponse = await cloudinary.uploader.upload(image) 
-            imageUrl = uploadResponse.secure_url;
+            try {
+                
+                const uploadResponse = await cloudinary.uploader.upload(image, {
+                    resource_type: "image",
+                    transformation: [
+                        { width: 800, height: 800, crop: "limit" }, // Limit size
+                        { quality: "auto" } // Optimize quality
+                    ]
+                });
+                imageUrl = uploadResponse.secure_url;
+            } catch (uploadError) {
+                
+                // Check if it's a configuration issue
+                if (uploadError.message.includes("Invalid api_key") || uploadError.message.includes("Invalid signature")) {
+                    return res.status(500).json({
+                        success: false, 
+                        message: "Image upload service configuration error. Please contact support."
+                    });
+                }
+                
+                // Check if it's a network issue
+                if (uploadError.message.includes("ENOTFOUND") || uploadError.message.includes("ETIMEDOUT")) {
+                    return res.status(500).json({
+                        success: false, 
+                        message: "Network error while uploading image. Please check your connection and try again."
+                    });
+                }
+                
+                // Check if it's a file format issue
+                if (uploadError.message.includes("Invalid image file") || uploadError.message.includes("format")) {
+                    return res.status(400).json({
+                        success: false, 
+                        message: "Invalid image format. Please use PNG, JPEG, or GIF files."
+                    });
+                }
+                
+                return res.status(400).json({
+                    success: false, 
+                    message: `Failed to upload image: ${uploadError.message}`
+                });
+            }
         }
+
         const newMessage = await Message.create({
             senderId,
             receiverId,
-            text,
-            image:imageUrl || "",
-          })
+            text: text || "",
+            image: imageUrl,
+        });
           
-          console.log("Message created:", newMessage._id);
           
-          //Emit message to receiver
-          const receiverSocketId = userSocketMap[receiverId];
-          console.log("Receiver socket ID:", receiverSocketId, "User socket map:", userSocketMap);
+        //Emit message to receiver
+        const receiverSocketId = userSocketMap[receiverId];
           
-          if(receiverSocketId){
+        if(receiverSocketId){
             io.to(receiverSocketId).emit("newMessage", newMessage);
-            console.log("Message emitted to socket:", receiverSocketId);
-          } else {
-            console.log("Receiver not online, message saved to database");
-          }
+        } else {
+        }
           
         res.json({success:true, message:"Message sent successfully", newMessage});
     }
     catch(error){
-        console.log(error.message);
         res.status(500).json({success:false, message:error.message});
     }
 }

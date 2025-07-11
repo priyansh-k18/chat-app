@@ -46,11 +46,8 @@ export const ChatProvider = ({children}) => {
             return;
         }
         
-        console.log("Sending message:", { messageData, selectedUser: selectedUser._id });
-        
         try{
             const {data} = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
-            console.log("Message response:", data);
             
             if(data.success){
                 setMessages((prevMessages) => [...prevMessages, data.newMessage]);
@@ -59,7 +56,6 @@ export const ChatProvider = ({children}) => {
                 toast.error(data.message || "Failed to send message");
             }
         }catch(error){
-            console.error("Error sending message:", error);
             toast.error(error.response?.data?.message || error.message || "Failed to send message");
         }
     }
@@ -72,7 +68,6 @@ export const ChatProvider = ({children}) => {
         socket.off("newMessage");
         
         socket.on("newMessage", (newMessage) => {
-            console.log("Received new message:", newMessage);
             
             if(selectedUser && newMessage.senderId === selectedUser._id){
                 // Message is from currently selected user - mark as seen immediately

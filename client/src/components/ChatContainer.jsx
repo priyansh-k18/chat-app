@@ -24,12 +24,6 @@ const ChatContainer = () => {
      e.preventDefault();
      if(input.trim() === "") return;
      
-     console.log("Attempting to send message:", { 
-       text: input.trim(), 
-       selectedUser: selectedUser?._id,
-       selectedUserName: selectedUser?.fullName 
-     });
-     
      await sendMessage({text:input.trim()});
      setInput("");
   }
@@ -68,8 +62,8 @@ const ChatContainer = () => {
         <img src={selectedUser.profilePic || assets.avatar_icon} alt="" className="w-8 rounded-full" />
         <p className="flex-1 text-lg text-white flex items-center gap-2">
           {selectedUser.fullName}
-          {onlineUsers.includes(selectedUser._id)}
-          <span className="w-2 h-2 rounded-full bg-green-500"></span>
+          {onlineUsers.includes(selectedUser._id) &&
+          <span className="w-2 h-2 rounded-full bg-green-500"></span>}
         </p>
         <img
           onClick={() => setSelectedUser(null)}
