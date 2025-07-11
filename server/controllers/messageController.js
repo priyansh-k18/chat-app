@@ -47,13 +47,14 @@ export const getMessages = async (req,res) => {
                 {senderId: myId, receiverId:selectedUserId},
                 {senderId: selectedUserId, receiverId:myId}
             ]
-        });
+        }).sort({createdAt: 1}); // Sort by creation time
 
+        // Mark messages from selected user as seen
         await Message.updateMany({
-            receiverId:myId,
-            senderId:selectedUserId,
-            seen:true
-        });
+            receiverId: myId,
+            senderId: selectedUserId,
+            seen: false
+        }, { seen: true });
 
         res.json({success:true, messages});
     }
@@ -84,6 +85,8 @@ export const sendMessage = async (req,res) => {
         const receiverId = req.params.id;
         const senderId = req.user._id;
 
+        console.log("Sending message:", { text, image: !!image, receiverId, senderId });
+
         let imageUrl;
         if(image){
            const uploadResponse = await cloudinary.uploader.upload(image) 
@@ -95,12 +98,21 @@ export const sendMessage = async (req,res) => {
             text,
             image:imageUrl || "",
           })
+          
+          console.log("Message created:", newMessage._id);
+          
           //Emit message to receiver
           const receiverSocketId = userSocketMap[receiverId];
+          console.log("Receiver socket ID:", receiverSocketId, "User socket map:", userSocketMap);
+          
           if(receiverSocketId){
             io.to(receiverSocketId).emit("newMessage", newMessage);
+            console.log("Message emitted to socket:", receiverSocketId);
+          } else {
+            console.log("Receiver not online, message saved to database");
           }
-        res.json({success:true, message:"Message sent successfully", message:newMessage});
+          
+        res.json({success:true, message:"Message sent successfully", newMessage});
     }
     catch(error){
         console.log(error.message);
