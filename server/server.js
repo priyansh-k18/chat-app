@@ -67,6 +67,18 @@ app.use(cors({
   credentials: true
 }));
 
+app.options("*", cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
 //Routes setup
 
 app.use("/api/status", (req,res) => res.send("server is live"));
