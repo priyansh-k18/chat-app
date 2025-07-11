@@ -50,7 +50,8 @@ app.use(express.json({limit:"4mb"}));
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://chat-app-cyan-sigma.vercel.app"
+  "https://chat-app-cyan-sigma.vercel.app",
+  "https://chat-eew37s3r0-priyansh-k18s-projects.vercel.app"
 ];
 app.use(cors({
   origin: allowedOrigins,
