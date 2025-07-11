@@ -17,6 +17,9 @@ import { testCloudinaryConfig } from "./lib/cloudinary.js";
 const app = express();
 const server = http.createServer(app);
 
+// Export server for production use
+export default server;
+
 
 //Initialize socket.io server
 
@@ -72,8 +75,10 @@ app.use((err, req, res, next) => {
   } else {
     console.log("✅ Cloudinary configuration test passed.");
   }
-  
-  const PORT = process.env.PORT || 5000;
-  server.listen(PORT, () => console.log("server is running on port: "+PORT));
+
+  if(process.env.NODE_ENV !== "production"){
+    const PORT = process.env.PORT || 5000;
+    server.listen(PORT, () => console.log("server is running on port: "+PORT));
+  }
 })();
 
