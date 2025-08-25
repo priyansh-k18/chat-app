@@ -73,7 +73,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+// Handle CORS preflight for API routes (Express 5 doesn't accept "*")
+app.options(/^\/api\/.*$/, cors(corsOptions));
 
 //Routes setup
 
