@@ -48,36 +48,32 @@ io.on("connection", (socket) => {
 //Middleware setup
 app.use(express.json({limit:"4mb"}));
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://chat-app-cyan-sigma.vercel.app",
-  "https://chat-eew37s3r0-priyansh-k18s-projects.vercel.app",
-  "https://chat-6675qgtdt-priyansh-k18s-projects.vercel.app"
-];
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
-}));
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // same-origin or non-browser requests
+  if (allowedOrigins.includes(origin)) return true;
+  // Allow any Vercel app domain by default (helpful for preview deployments)
+  try {
+    const url = new URL(origin);
+    if (url.hostname.endsWith(".vercel.app")) return true;
+  } catch (e) {}
+  return false;
+};
 
-app.options("*", cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("Not allowed by CORS"));
-    }
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (isOriginAllowed(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
   },
-  credentials: true
-}));
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 //Routes setup
 
