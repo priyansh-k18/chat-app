@@ -78,6 +78,19 @@ app.options(/^\/api\/.*$/, cors(corsOptions));
 
 //Routes setup
 
+// Root route for Vercel deployment
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "Chat App Backend is running!",
+    status: "success",
+    endpoints: {
+      status: "/api/status",
+      auth: "/api/auth",
+      messages: "/api/messages"
+    }
+  });
+});
+
 app.use("/api/status", (req,res) => res.send("server is live"));
 app.use("/api/auth", userRouter);
 app.use("/api/messages",messageRouter)
@@ -93,19 +106,27 @@ app.use((err, req, res, next) => {
 });
 
 (async () => {
-  await connectDb();
-  
-  // Test Cloudinary configuration
-  const cloudinaryTest = await testCloudinaryConfig();
-  if (!cloudinaryTest) {
-    console.warn("⚠️  Cloudinary configuration test failed. Image uploads may not work properly.");
-  } else {
-    console.log("✅ Cloudinary configuration test passed.");
-  }
+  try {
+    await connectDb();
+    
+    // Test Cloudinary configuration
+    const cloudinaryTest = await testCloudinaryConfig();
+    if (!cloudinaryTest) {
+      console.warn("⚠️  Cloudinary configuration test failed. Image uploads may not work properly.");
+    } else {
+      console.log("✅ Cloudinary configuration test passed.");
+    }
 
-  if(process.env.NODE_ENV !== "production"){
-    const PORT = process.env.PORT || 5000;
-    server.listen(PORT, () => console.log("server is running on port: "+PORT));
+    // Only start server locally, not on Vercel
+    if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+      const PORT = process.env.PORT || 5000;
+      server.listen(PORT, () => console.log("server is running on port: "+PORT));
+    } else {
+      console.log("🚀 Server ready for Vercel deployment");
+    }
+  } catch (error) {
+    console.error("❌ Server startup failed:", error);
+    process.exit(1);
   }
 })();
 
