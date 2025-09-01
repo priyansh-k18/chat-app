@@ -1,5 +1,5 @@
 // Backend configuration
-export const BACKEND_URL = "https://chat-app-backend-772kukuc0-priyansh-k18s-projects.vercel.app";
+export const BACKEND_URL = "https://chat-app-backend-f8h6yuew0-priyansh-k18s-projects.vercel.app";
 
 // API endpoints
 export const API_ENDPOINTS = {

@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
 //Middleware setup
 app.use(express.json({limit:"4mb"}));
 
-const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000")
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000,https://chat-app-cyan-sigma.vercel.app")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
@@ -70,6 +70,9 @@ const corsOptions = {
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'token'],
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));

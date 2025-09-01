@@ -21,7 +21,7 @@ JWT_SECRET=your_super_secret_jwt_key_here
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-CORS_ORIGINS=http://localhost:3000,https://your-frontend-domain.com
+CORS_ORIGINS=http://localhost:3000,https://chat-app-cyan-sigma.vercel.app
 ```
 
 ### Optional Variables:
@@ -44,9 +44,9 @@ vercel --prod
 ```
 
 ### 3. Test Backend Endpoints
-- [ ] Root URL: `https://your-backend.vercel.app/`
-- [ ] Status: `https://your-backend.vercel.app/api/status`
-- [ ] Auth: `https://your-backend.vercel.app/api/auth`
+- [ ] Root URL: `https://chat-app-backend-f8h6yuew0-priyansh-k18s-projects.vercel.app/`
+- [ ] Status: `https://chat-app-backend-f8h6yuew0-priyansh-k18s-projects.vercel.app/api/status`
+- [ ] Auth: `https://chat-app-backend-f8h6yuew0-priyansh-k18s-projects.vercel.app/api/auth`
 
 ### 4. Update Frontend
 - [ ] Update backend URL in config
