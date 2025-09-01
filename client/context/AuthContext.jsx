@@ -3,8 +3,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import {io} from "socket.io-client";
 import {AuthContext} from "./AuthContext";
+import { BACKEND_URL } from "../src/config/config.js";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = BACKEND_URL;
 axios.defaults.baseURL = backendUrl;
 
 
